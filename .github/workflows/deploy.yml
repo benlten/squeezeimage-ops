@@ -12,13 +12,13 @@ jobs:
     steps:
     - name: Setup SSH key
       env:
-        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        PRIVATE_KEY: ${{ secrets.SQUEEZE_SECRET }}
       run: |
         mkdir -p ~/.ssh
         
         # Check if secret exists
         if [ -z "$PRIVATE_KEY" ]; then
-          echo "ERROR: SSH_PRIVATE_KEY secret is empty or not set!"
+          echo "ERROR: SQUEEZE_SECRET secret is empty or not set!"
           exit 1
         fi
         
@@ -42,9 +42,6 @@ jobs:
           cd ~/squeezeimage-ops
           git pull origin main
           
-          # Set environment variable
-          echo "SQUEEZE_SECRET=${{ secrets.SQUEEZE_SECRET }}" > .env
-          
           # Check if Docker is installed
           if ! command -v docker &> /dev/null; then
             echo "Docker not installed. Installing Docker..."
@@ -62,7 +59,7 @@ jobs:
           if [ -f docker-compose.yml ]; then
             echo "Starting services with Docker Compose..."
             docker-compose pull
-            docker-compose --env-file .env up -d --remove-orphans
+            docker-compose up -d --remove-orphans
             docker-compose ps
           fi
           
