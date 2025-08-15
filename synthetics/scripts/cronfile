@@ -1,0 +1,6 @@
+
+# m h  dom mon dow  command
+* * * * * cd /app && npm run api >> /var/log/synthetics/cron.log 2>&1
+*/5 * * * * cd /app && npm run e2e >> /var/log/synthetics/cron.log 2>&1
+0 3 * * * cd /app && npm run links >> /var/log/synthetics/cron.log 2>&1
+30 3 * * * cd /app && npm run lighthouse >> /var/log/synthetics/cron.log 2>&1

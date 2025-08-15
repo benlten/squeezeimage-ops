@@ -1,0 +1,15 @@
+{
+  "name": "synthetics-runner",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "e2e": "node scripts/run_playwright.js",
+    "api": "node scripts/run_newman.js",
+    "links": "node scripts/run_linkinator.js",
+    "lighthouse": "node scripts/run_lighthouse.js",
+    "all": "npm run api && npm run e2e && npm run links && npm run lighthouse"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.46.0"
+  }
+}

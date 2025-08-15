@@ -1,0 +1,16 @@
+[
+  {
+    "site": "siteA",
+    "env": "prod",
+    "baseUrl": "https://example.com",
+    "apiBase": "https://api.example.com",
+    "sitemap": "https://example.com/sitemap.xml",
+    "lighthouseUrls": [
+      "https://example.com/"
+    ],
+    "playwright": {
+      "loginPath": "/",
+      "assertText": "Example Domain"
+    }
+  }
+]
