@@ -10,13 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H 137.184.1.154 >> ~/.ssh/known_hosts
+    
     - name: Deploy to server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: 137.184.1.154
-        username: squeezeadmin
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
+      run: |
+        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no squeezeadmin@137.184.1.154 'bash -s' << 'EOF'
           cd ~/squeezeimage-ops
           git pull origin main
           
@@ -47,3 +50,4 @@ jobs:
           echo "Deployment completed successfully!"
           echo "Repository updated at: $(date)"
           git log --oneline -1
+        EOF
