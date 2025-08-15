@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:www.squeezeimage.com)",
+      "Bash(npm install)",
+      "Bash(BASE_URL=\"https://www.squeezeimage.com\" PW_ASSERT_TEXT=\"Smart Image Compression\" npx playwright test --reporter=verbose)",
+      "Bash(BASE_URL=\"https://www.squeezeimage.com\" PW_ASSERT_TEXT=\"Smart Image Compression\" npx playwright test)",
+      "Bash(npx playwright:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "acceptEdits"
+  }
+}

@@ -56,17 +56,33 @@ jobs:
           cd ~/squeezeimage-ops
           git pull origin main
           
-          # Check if Docker is installed
-          if ! command -v docker &> /dev/null; then
-            echo "Docker not installed. Installing Docker..."
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-            sudo usermod -aG docker squeezeadmin
-            rm get-docker.sh
+          # Install security tools and Docker if needed
+          if ! command -v docker &> /dev/null || ! command -v fail2ban-client &> /dev/null; then
+            echo "Installing Docker and security tools..."
             
-            # Install Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
+            # Update packages
+            sudo apt update
+            
+            # Install fail2ban for SSH protection
+            if ! command -v fail2ban-client &> /dev/null; then
+              echo "Installing fail2ban..."
+              sudo apt install -y fail2ban
+              sudo systemctl enable fail2ban
+              sudo systemctl start fail2ban
+            fi
+            
+            # Install Docker if not present
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
+              sudo usermod -aG docker squeezeadmin
+              rm get-docker.sh
+              
+              # Install Docker Compose
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
           fi
           
           # Pull latest changes and restart services if docker-compose.yml exists

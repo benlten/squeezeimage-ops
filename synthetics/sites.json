@@ -1,16 +1,16 @@
 [
   {
-    "site": "siteA",
+    "site": "squeezeimage",
     "env": "prod",
-    "baseUrl": "https://example.com",
-    "apiBase": "https://api.example.com",
-    "sitemap": "https://example.com/sitemap.xml",
+    "baseUrl": "https://www.squeezeimage.com",
+    "apiBase": "https://www.squeezeimage.com/api",
+    "sitemap": "https://www.squeezeimage.com/sitemap.xml",
     "lighthouseUrls": [
-      "https://example.com/"
+      "https://www.squeezeimage.com/"
     ],
     "playwright": {
       "loginPath": "/",
-      "assertText": "Example Domain"
+      "assertText": "Smart Image Compression"
     }
   }
 ]
