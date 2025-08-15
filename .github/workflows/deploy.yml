@@ -30,11 +30,25 @@ jobs:
         
         # Debug: Check key was written
         echo "Key file size: $(wc -c < ~/.ssh/deploy_key) bytes"
-        echo "Key starts with: $(head -n 1 ~/.ssh/deploy_key)"
+        echo "Number of lines: $(wc -l < ~/.ssh/deploy_key)"
+        
+        # Check if it's a valid SSH key format
+        if grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/deploy_key; then
+          echo "Key appears to be in OpenSSH format"
+        elif grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/deploy_key; then
+          echo "Key appears to be in RSA format"
+        else
+          echo "WARNING: Key format not recognized"
+          echo "First 50 chars: $(head -c 50 ~/.ssh/deploy_key)"
+        fi
         
         # Test the key format
-        ssh-keygen -y -f ~/.ssh/deploy_key > ~/.ssh/deploy_key.pub
-        echo "Public key generated successfully"
+        if ssh-keygen -y -f ~/.ssh/deploy_key > ~/.ssh/deploy_key.pub 2>/dev/null; then
+          echo "Public key generated successfully"
+        else
+          echo "ERROR: Failed to parse private key"
+          exit 1
+        fi
     
     - name: Deploy to server
       run: |
