@@ -13,15 +13,24 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+        
+        # Check if secret exists
+        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+          echo "ERROR: SSH_PRIVATE_KEY secret is empty or not set!"
+          exit 1
+        fi
+        
+        # Write the key
+        cat > ~/.ssh/deploy_key << 'ENDKEY'
+        ${{ secrets.SSH_PRIVATE_KEY }}
+        ENDKEY
+        
         chmod 600 ~/.ssh/deploy_key
         ssh-keyscan -H 137.184.1.154 >> ~/.ssh/known_hosts
         
-        # Debug: Check key format
-        echo "Key starts with:"
-        head -n 1 ~/.ssh/deploy_key
-        echo "Key ends with:"
-        tail -n 1 ~/.ssh/deploy_key
+        # Debug: Check key was written
+        echo "Key file size: $(wc -c < ~/.ssh/deploy_key) bytes"
+        echo "Key starts with: $(head -n 1 ~/.ssh/deploy_key)"
         
         # Test the key format
         ssh-keygen -y -f ~/.ssh/deploy_key > ~/.ssh/deploy_key.pub
