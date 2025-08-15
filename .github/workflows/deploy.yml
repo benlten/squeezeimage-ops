@@ -11,19 +11,19 @@ jobs:
     
     steps:
     - name: Setup SSH key
+      env:
+        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
         mkdir -p ~/.ssh
         
         # Check if secret exists
-        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+        if [ -z "$PRIVATE_KEY" ]; then
           echo "ERROR: SSH_PRIVATE_KEY secret is empty or not set!"
           exit 1
         fi
         
         # Write the key
-        cat > ~/.ssh/deploy_key << 'ENDKEY'
-        ${{ secrets.SSH_PRIVATE_KEY }}
-        ENDKEY
+        echo "$PRIVATE_KEY" > ~/.ssh/deploy_key
         
         chmod 600 ~/.ssh/deploy_key
         ssh-keyscan -H 137.184.1.154 >> ~/.ssh/known_hosts
