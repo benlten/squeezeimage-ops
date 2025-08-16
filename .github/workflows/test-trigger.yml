@@ -69,12 +69,33 @@ jobs:
         cd synthetics
         npm run lighthouse || echo "Lighthouse script needs to be implemented"
     
-    - name: Upload test results
+    - name: Generate test metrics for dashboard
+      if: always()
+      run: |
+        cd synthetics
+        node scripts/test-reporter.js
+        
+        # Also create a simple JSON summary for the droplet
+        cat > test-summary.json << EOF
+        {
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "site": "squeezeimage.com",
+          "status": "${{ job.status }}",
+          "run_number": "${{ github.run_number }}",
+          "test_suite": "${{ github.event.inputs.test_suite || 'all' }}",
+          "workflow_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        }
+        EOF
+    
+    - name: Upload test results and metrics
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: playwright-report-${{ github.run_number }}
-        path: synthetics/playwright-report/
+        name: test-results-${{ github.run_number }}
+        path: |
+          synthetics/playwright-report/
+          synthetics/test-summary.json
+          synthetics/targets/test-results.prom
         retention-days: 7
     
     - name: Create test summary
