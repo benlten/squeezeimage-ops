@@ -1,8 +1,13 @@
 const { test, expect } = require('@playwright/test');
 
 const base = process.env.BASE_URL || 'https://www.squeezeimage.com';
-const demoEmail = process.env.DEMO_EMAIL || 'demo@squeezit.com';
-const demoPassword = process.env.DEMO_PASSWORD || 'Sq8@dMin!2024#Zx';
+const demoEmail = process.env.DEMO_EMAIL;
+const demoPassword = process.env.DEMO_PASSWORD;
+
+if (!demoEmail || !demoPassword) {
+  console.error('DEMO_EMAIL and DEMO_PASSWORD environment variables are required');
+  process.exit(1);
+}
 
 test.describe('SqueezeImage Admin Tests', () => {
   
