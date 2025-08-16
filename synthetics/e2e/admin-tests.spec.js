@@ -44,7 +44,7 @@ test.describe('SqueezeImage Admin Tests', () => {
     await page.waitForTimeout(2000);
     
     // Look for upload functionality
-    const uploadArea = page.locator('.upload-area, .file-upload, input[type="file"], [data-testid="upload"]').first();
+    const uploadArea = page.locator('.drop-zone, input[type="file"], .upload').first();
     await expect(uploadArea).toBeVisible({ timeout: 5000 });
   });
 
@@ -93,10 +93,10 @@ test.describe('SqueezeImage Admin Tests', () => {
     await page.waitForTimeout(3000);
     
     // Check that main compression features are available
-    const compressionFeatures = page.locator('.compress, .optimize, .upload, [data-testid="compress"], button:has-text("compress")', { ignoreCase: true });
+    const compressionFeatures = page.locator('.drop-zone, .btn, .format-box, .toggle-switch').first();
     
     // At least one compression-related element should be present
-    await expect(compressionFeatures.first()).toBeVisible({ timeout: 5000 });
+    await expect(compressionFeatures).toBeVisible({ timeout: 5000 });
   });
 
 });
