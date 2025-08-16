@@ -97,6 +97,67 @@ class TestReporter {
     return metrics.join('\n');
   }
 
+  async pushMetricsToPushgateway() {
+    const pushgatewayUrl = process.env.PUSHGATEWAY_URL || 'http://localhost:9091';
+    const jobName = 'squeezeimage_tests';
+    
+    try {
+      // Push overall success rate
+      const successRate = this.results.summary.total > 0 
+        ? this.results.summary.passed / this.results.summary.total 
+        : 0;
+      
+      await this.pushMetric(pushgatewayUrl, jobName, 'squeezeimage_test_success_rate', successRate);
+      
+      // Push individual test results
+      for (const [testName, result] of Object.entries(this.results.tests)) {
+        const value = result.status === 'PASS' ? 1 : 0;
+        await this.pushMetric(pushgatewayUrl, jobName, 'squeezeimage_test_result', value, {test: testName, site: 'squeezeimage.com'});
+        await this.pushMetric(pushgatewayUrl, jobName, 'squeezeimage_test_duration_ms', result.duration, {test: testName, site: 'squeezeimage.com'});
+      }
+      
+      // Push timestamp
+      const timestamp = Math.floor(new Date(this.results.timestamp).getTime() / 1000);
+      await this.pushMetric(pushgatewayUrl, jobName, 'squeezeimage_last_test_timestamp', timestamp);
+      
+      console.log(`✅ Metrics pushed to pushgateway at ${pushgatewayUrl}`);
+    } catch (error) {
+      console.error('Error pushing metrics to pushgateway:', error);
+      // Fallback to file writing
+      this.writeMetricsFile();
+    }
+  }
+
+  async pushMetric(pushgatewayUrl, job, metricName, value, labels = {}) {
+    const labelString = Object.entries(labels).map(([k, v]) => `${k}="${v}"`).join(',');
+    const labelSuffix = labelString ? `{${labelString}}` : '';
+    const metricData = `${metricName}${labelSuffix} ${value}\n`;
+    
+    const url = `${pushgatewayUrl}/metrics/job/${job}`;
+    
+    // Use curl since we're in a simple environment
+    const { spawn } = require('child_process');
+    
+    return new Promise((resolve, reject) => {
+      const curl = spawn('curl', [
+        '-X', 'POST',
+        '-H', 'Content-Type: text/plain',
+        '--data-binary', metricData,
+        url
+      ]);
+      
+      curl.on('close', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`curl exited with code ${code}`));
+        }
+      });
+      
+      curl.on('error', reject);
+    });
+  }
+
   writeMetricsFile() {
     const metricsDir = path.join(__dirname, '../../targets');
     if (!fs.existsSync(metricsDir)) {
@@ -152,11 +213,11 @@ class TestReporter {
     }
   }
 
-  generateReport() {
+  async generateReport() {
     console.log('🧪 Generating test results report...');
     
     this.parsePlaywrightResults();
-    this.writeMetricsFile();
+    await this.pushMetricsToPushgateway();
     this.writeLokiLogs();
     
     console.log('\n📊 Test Summary:');
@@ -179,7 +240,7 @@ class TestReporter {
 // Run if called directly
 if (require.main === module) {
   const reporter = new TestReporter();
-  reporter.generateReport();
+  reporter.generateReport().catch(console.error);
 }
 
 module.exports = TestReporter;

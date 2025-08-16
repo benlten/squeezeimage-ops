@@ -23,6 +23,8 @@ scrape_configs:
     static_configs:
       - targets:
         - https://www.squeezeimage.com
+        - https://squeezeimage.com
+        - https://squeezeimage-albl7.ondigitalocean.app
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -31,12 +33,10 @@ scrape_configs:
       - target_label: __address__
         replacement: blackbox_exporter:9115
 
-  - job_name: squeezeimage_tests
-    scrape_interval: 60s
-    file_sd_configs:
-      - files:
-        - /etc/targets/test-results.prom
-        refresh_interval: 30s
+  - job_name: pushgateway
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['pushgateway:9091']
 
   - job_name: blackbox_tcp
     metrics_path: /probe
