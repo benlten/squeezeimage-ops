@@ -15,7 +15,9 @@
       "Bash(npm install)",
       "Bash(BASE_URL=\"https://www.squeezeimage.com\" PW_ASSERT_TEXT=\"Smart Image Compression\" npx playwright test --reporter=verbose)",
       "Bash(BASE_URL=\"https://www.squeezeimage.com\" PW_ASSERT_TEXT=\"Smart Image Compression\" npx playwright test)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(DEMO_EMAIL=\"demo@squeezit.com\" DEMO_PASSWORD=\"Sq8@dMin!2024#Zx\" npx playwright test e2e/admin-tests.spec.js --project=chromium --reporter=line)",
+      "Bash(DEMO_EMAIL=\"demo@squeezit.com\" DEMO_PASSWORD=\"Sq8@dMin!2024#Zx\" npx playwright test e2e/admin-tests.spec.js --reporter=line)"
     ],
     "deny": [],
     "ask": [],

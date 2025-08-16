@@ -9,8 +9,21 @@
       "https://www.squeezeimage.com/"
     ],
     "playwright": {
-      "loginPath": "/",
-      "assertText": "Smart Image Compression"
+      "loginPath": "/login",
+      "assertText": "Smart Image Compression",
+      "demoUser": {
+        "emailSelector": "input[type='email'], input[name='email'], #email",
+        "passwordSelector": "input[type='password'], input[name='password'], #password",
+        "loginButtonSelector": "button[type='submit'], input[type='submit'], .login-btn, #login",
+        "successIndicator": "dashboard, .dashboard, #dashboard, .admin-panel, .upload-area"
+      },
+      "testScenarios": [
+        "homepage_load",
+        "user_login", 
+        "image_upload",
+        "compression_test",
+        "admin_features"
+      ]
     }
   }
 ]
