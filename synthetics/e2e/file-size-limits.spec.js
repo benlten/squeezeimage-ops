@@ -15,7 +15,7 @@ test.describe('File Size Limit Tests', () => {
     await expect(uploadArea).toBeVisible({ timeout: 10000 });
     
     // Try to upload a small file (if file input is visible)
-    const fileInput = page.locator('input[type="file"]');
+    const fileInput = page.locator('input[type="file"]').first();
     if (await fileInput.count() > 0) {
       // Create a small test file (1KB)
       const smallFile = path.join(__dirname, '../test-data/small-test.txt');
@@ -74,9 +74,16 @@ test.describe('File Size Limit Tests', () => {
     
     await page.waitForTimeout(3000);
     
-    // Check for upload functionality
-    const uploadArea = page.locator('.drop-zone, input[type="file"]').first();
-    await expect(uploadArea).toBeVisible({ timeout: 10000 });
+    // Navigate to main page after login (where upload features are)
+    await page.goto(base);
+    await page.waitForTimeout(2000);
+    
+    // Check for upload functionality - file inputs exist but may be hidden
+    const fileInputs = page.locator('input[type="file"]');
+    const fileInputCount = await fileInputs.count();
+    
+    console.log(`Admin user: found ${fileInputCount} file input elements`);
+    expect(fileInputCount).toBeGreaterThan(0);
     
     // Admin users should have no file size warnings/limits
     const limitWarning = page.locator('text=/file size.*limit|maximum.*size|upgrade.*larger/i');

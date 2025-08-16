@@ -1,0 +1,4 @@
+This is a small test file for upload testing.
+It contains just enough content to be a valid file
+but should be well under any reasonable size limits.
+Total size: approximately 1KB.
