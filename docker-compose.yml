@@ -108,21 +108,6 @@ services:
     depends_on:
       - loki
 
-  webhook-receiver:
-    image: node:20-alpine
-    container_name: webhook-receiver
-    restart: unless-stopped
-    working_dir: /app
-    command: ["node", "webhook-receiver.js"]
-    environment:
-      - WEBHOOK_PORT=3001
-      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
-    volumes:
-      - ./webhook-receiver.js:/app/webhook-receiver.js:ro
-      - webhook-logs:/app/logs
-    ports:
-      - "3001:3001"
-    networks: [opsnet]
 
 networks:
   opsnet: {}
@@ -133,4 +118,3 @@ volumes:
   tempo-data: {}
   grafana-data: {}
   synthetics-logs: {}
-  webhook-logs: {}

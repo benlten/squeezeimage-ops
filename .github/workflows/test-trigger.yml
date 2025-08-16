@@ -1,21 +1,9 @@
 name: Test Suite Trigger
 
 on:
-  # Trigger via webhook from app deployments
-  repository_dispatch:
-    types: [app-deployed, test-request]
-  
   # Manual trigger
   workflow_dispatch:
     inputs:
-      test_env:
-        description: 'Environment to test'
-        required: false
-        default: 'prod'
-        type: choice
-        options:
-          - prod
-          - staging
       test_suite:
         description: 'Test suite to run'
         required: false
@@ -89,26 +77,14 @@ jobs:
         path: synthetics/playwright-report/
         retention-days: 7
     
-    - name: Notify on failure
-      if: failure()
-      run: |
-        echo "🚨 Tests failed for squeezeimage.com"
-        echo "Check the artifacts for detailed results"
-        echo "Trigger source: ${{ github.event_name }}"
-        
-    - name: Post results to droplet
+    - name: Create test summary
       if: always()
-      env:
-        SSH_KEY: ${{ secrets.SQUEEZE_SECRET }}
       run: |
-        # Create SSH key
-        mkdir -p ~/.ssh
-        echo "$SSH_KEY" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
-        
-        # Post test results to droplet
-        TEST_STATUS="${{ job.status }}"
-        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-        
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no squeezeadmin@137.184.1.154 \
-          "echo '[$TIMESTAMP] Test run: $TEST_STATUS (trigger: ${{ github.event_name }})' >> ~/test-results.log"
+        echo "## 🧪 SqueezeImage.com Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Site tested:** https://www.squeezeimage.com" >> $GITHUB_STEP_SUMMARY
+        echo "- **Test run:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Test suite:** ${{ github.event.inputs.test_suite || 'all' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Check the uploaded artifacts for detailed Playwright test reports!" >> $GITHUB_STEP_SUMMARY
